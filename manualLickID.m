@@ -22,11 +22,17 @@ if (isfield(licks(curLick),'certainty'))
 end
 function KeyPressCb(~,evnt)
     %fprintf('key pressed: %s\n',evnt.Key);
-    pause(.05)
     if strcmpi(evnt.Key,'leftarrow')
         curLick = curLick+1;
         plotNext(curLick)
     elseif strcmpi(evnt.Key,'rightarrow')
+        licks(curLick).duration = licks(curLick).offset - licks(curLick).onset;
+        licks(curLick).raw_voltage = data.raw_voltage(licks(curLick).onset_ind:licks(curLick).offset_ind);
+        licks(curLick).smoothed_voltage = data.smoothed_voltage(licks(curLick).onset_ind:licks(curLick).offset_ind);
+        [maxVal,maxInd] = max(licks(curLicks).raw_voltage);
+        licks(curLick).maxInd = licks(curLick).onset_ind + maxInd - 1;
+        licks(curLick).maxTime = data.tvec(licks(curLick).maxInd);
+        licks(curLick).maxVal = data.raw_voltage(licks(curLick).maxInd);
         nGood = nGood + 1;
         newlicks(nGood) = licks(curLick);
         curLick = curLick+1;
