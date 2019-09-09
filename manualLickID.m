@@ -17,8 +17,12 @@ plot(lickOn,licks(curLick).onsetVal,'b*')
 plot(lickOff,licks(curLick).offsetVal,'r*')
 plot(lickMax,licks(curLick).maxVal,'k*')
 hold off;
+if (isfield(licks(curLick),'certainty'))
+    title(['Certainty = ' num2str(licks(curLick).certainty)])
+end
 function KeyPressCb(~,evnt)
     %fprintf('key pressed: %s\n',evnt.Key);
+    pause(.05)
     if strcmpi(evnt.Key,'leftarrow')
         curLick = curLick+1;
         plotNext(curLick)
@@ -35,6 +39,36 @@ function KeyPressCb(~,evnt)
             newlicks = newlicks(1:end-1);
             good_licks = good_licks(good_licks~=curLick);
         end
+        plotNext(curLick)
+    elseif strcmpi(evnt.Key,'q')
+        licks(curLick).onset_ind = licks(curLick).onset_ind-1;
+        licks(curLick).onset = data.tvec(licks(curLick).onset_ind);
+        licks(curLick).onsetVal = data.raw_voltage(licks(curLick).onset_ind);
+        plotNext(curLick)
+    elseif strcmpi(evnt.Key,'w')
+        licks(curLick).onset_ind = licks(curLick).onset_ind+1;
+        licks(curLick).onset = data.tvec(licks(curLick).onset_ind);
+        licks(curLick).onsetVal = data.raw_voltage(licks(curLick).onset_ind);
+        plotNext(curLick)
+    elseif strcmpi(evnt.Key,'z')
+        licks(curLick).maxInd = licks(curLick).maxInd-1;
+        licks(curLick).maxTime = data.tvec(licks(curLick).maxInd);
+        licks(curLick).maxVal = data.raw_voltage(licks(curLick).maxInd);
+        plotNext(curLick)
+    elseif strcmpi(evnt.Key,'x')
+        licks(curLick).maxInd = licks(curLick).maxInd+1;
+        licks(curLick).maxTime = data.tvec(licks(curLick).maxInd);
+        licks(curLick).maxVal = data.raw_voltage(licks(curLick).maxInd);
+        plotNext(curLick)
+    elseif strcmpi(evnt.Key,'a')
+        licks(curLick).offset_ind = licks(curLick).offset_ind-1;
+        licks(curLick).offset = data.tvec(licks(curLick).offset_ind);
+        licks(curLick).offsetVal = data.raw_voltage(licks(curLick).offset_ind);
+        plotNext(curLick)
+    elseif strcmpi(evnt.Key,'s')
+        licks(curLick).offset_ind = licks(curLick).offset_ind+1;
+        licks(curLick).offset = data.tvec(licks(curLick).offset_ind);
+        licks(curLick).offsetVal = data.raw_voltage(licks(curLick).offset_ind);
         plotNext(curLick)
     end  
 end
@@ -55,6 +89,11 @@ function plotNext(curLick)
     plot(lickMax,licks(curLick).maxVal,'k*')
     ylim([0 dataMax])
     hold off;
+    if (isfield(licks(curLick),'certainty'))
+        title({['Duration = ' num2str(licks(curLick).duration)], ...
+                ['Certainty = ' num2str(licks(curLick).certainty)], ...
+                ['Lick ' num2str(curLick) ' / ' num2str(length(licks))]})
+    end
 end
 uiwait;
 end
