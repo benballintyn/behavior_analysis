@@ -6,6 +6,7 @@ dataOffset = 1000;
 good_licks = [];
 h=figure;
 set(h,'KeyPressFcn',@KeyPressCb);
+set(h,'Position',[200 200 1600 1000])
 on = max(1,licks(curLick).onset_ind-dataOffset);
 off = min(length(data.tvec),licks(curLick).offset_ind+dataOffset);
 lickOn = licks(curLick).onset;
@@ -21,7 +22,7 @@ if (isfield(licks(curLick),'certainty'))
     title(['Certainty = ' num2str(licks(curLick).certainty)])
 end
 function KeyPressCb(~,evnt)
-    %fprintf('key pressed: %s\n',evnt.Key);
+    fprintf('key pressed: %s\n',evnt.Key);
     if strcmpi(evnt.Key,'leftarrow')
         curLick = curLick+1;
         plotNext(curLick)
@@ -29,7 +30,7 @@ function KeyPressCb(~,evnt)
         licks(curLick).duration = licks(curLick).offset - licks(curLick).onset;
         licks(curLick).raw_voltage = data.raw_voltage(licks(curLick).onset_ind:licks(curLick).offset_ind);
         licks(curLick).smoothed_voltage = data.smoothed_voltage(licks(curLick).onset_ind:licks(curLick).offset_ind);
-        [maxVal,maxInd] = max(licks(curLicks).raw_voltage);
+        [maxVal,maxInd] = max(licks(curLick).raw_voltage);
         licks(curLick).maxInd = licks(curLick).onset_ind + maxInd - 1;
         licks(curLick).maxTime = data.tvec(licks(curLick).maxInd);
         licks(curLick).maxVal = data.raw_voltage(licks(curLick).maxInd);
@@ -99,6 +100,9 @@ function plotNext(curLick)
         title({['Duration = ' num2str(licks(curLick).duration)], ...
                 ['Certainty = ' num2str(licks(curLick).certainty)], ...
                 ['Lick ' num2str(curLick) ' / ' num2str(length(licks))]})
+    else
+        title({['Duration = ' num2str(licks(curLick).duration)],...
+               ['Lick ' num2str(curLick) ' / ' num2str(length(licks))]})
     end
 end
 uiwait;
