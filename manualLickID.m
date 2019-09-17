@@ -22,7 +22,7 @@ if (isfield(licks(curLick),'certainty'))
     title(['Certainty = ' num2str(licks(curLick).certainty)])
 end
 function KeyPressCb(~,evnt)
-    fprintf('key pressed: %s\n',evnt.Key);
+    %fprintf('key pressed: %s\n',evnt.Key);
     if strcmpi(evnt.Key,'leftarrow')
         curLick = curLick+1;
         plotNext(curLick)

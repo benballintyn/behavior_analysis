@@ -37,7 +37,7 @@ end
 randInds = randperm(length(X));
 X = X(randInds);
 Y = Y(randInds);
-tstValFrac = floor(.1*length(X));
+tstValFrac = floor(.05*length(X));
 trEnd = length(X) - 2*tstValFrac;
 valEnd = trEnd + tstValFrac;
 tstEnd = valEnd + tstValFrac;

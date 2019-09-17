@@ -1,5 +1,5 @@
-function [licks] = addLicks(data,licks)
-datalength = length(data(1).raw_voltage);
+function [licks] = addLicks(data,licks,savedir,allLicks,chan)
+datalength = length(data.raw_voltage);
 wndwSize = 2000;
 nwndws = ceil(datalength/wndwSize);
 dataMax = max(data.raw_voltage);
@@ -46,8 +46,13 @@ function KeyPressCb(~,evnt)
             tmpLick.maxTime = data.tvec(tmpLick.maxInd);
             tmpLick.maxVal = maxVal;
             tmpLick.solution = data.solution;
+            tmpLick.certainty = NaN;
             laterLickInds = find([licks.onset] > tmpLick.offset);
-            licks = [licks(1:(laterLickInds(1)-1)) tmpLick licks(laterLickInds)];
+            if (isempty(laterLickInds))
+                licks = [licks tmpLick];
+            else
+                licks = [licks(1:(laterLickInds(1)-1)) tmpLick licks(laterLickInds)];
+            end
         end
         onsetLineInds = [];
         offsetLineInds = [];
@@ -89,6 +94,12 @@ function KeyPressCb(~,evnt)
     elseif strcmpi(evnt.Key,'x')
         offset = offset + speedFactor;
         plotWindow(wndwNum)
+    elseif strcmpi(evnt.Key,'tab')
+        disp('saving current progress...')
+        allLicks{chan} = licks;
+        licks = allLicks;
+        save([savedir '/licks.mat'],'licks','-mat')
+        licks = allLicks{chan};
     elseif strcmpi(evnt.Key,'return')
         close all;
         return;
@@ -120,16 +131,20 @@ function plotWindow(wndwNum)
     end
     tvecVals = data.tvec(offsetLineInds);
     for i=1:length(offsetLineInds)
-        plot([tvecVals(i) tvecVals(i)],[0 dataMax])
+        plot([tvecVals(i) tvecVals(i)],[0 dataMax],'r')
     end
     ylim([0 dataMax])
     hold off;
 end
 
 function mid_ind=makeOnsetOffsetLines(wndwNum)
-    start_ind = (wndwNum-1)*wndwSize + 1;
-    end_ind = min(datalength,wndwNum*wndwSize);
-    mid_ind = floor((end_ind + start_ind + 1)/2);
+    if isempty(offsetLineInds)
+        start_ind = (wndwNum-1)*wndwSize + 1;
+        end_ind = min(datalength,wndwNum*wndwSize);
+        mid_ind = floor((end_ind + start_ind + 1)/2);
+    else
+        mid_ind = offsetLineInds(end)+5;
+    end
 end
 uiwait;
 end

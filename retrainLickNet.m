@@ -3,7 +3,7 @@ function [lickNet] = retrainLickNet(netType,dates,animals,batchSize)
 
 nbatches = ceil(length(Xtr)/batchSize);
 i=1;
-initialLearnRate = .00005;
+initialLearnRate = .000005;
 while i < nbatches
     try
         disp(['Batch ' num2str(i) ' / ' num2str(nbatches)])
@@ -20,7 +20,7 @@ while i < nbatches
                 'Shuffle','every-epoch','ExecutionEnvironment','gpu',...
                 'ValidationData',{Xval(valRandInds),Yval(valRandInds)},'ValidationFrequency',10,...
                 'ValidationPatience',10,'Plots','training-progress',...
-                'LearnRateSchedule','piecewise','LearnRateDropFactor',.8,...
+                'LearnRateSchedule','piecewise','LearnRateDropFactor',.5,...
                 'LearnRateDropPeriod',1,'InitialLearnRate',initialLearnRate/i,'Plots','none');
         lickNet = trainNetwork(Xtr(trRandInds),Ytr(trRandInds),lickNet.Layers,options);
         if (strcmp(netType,'2bottle'))

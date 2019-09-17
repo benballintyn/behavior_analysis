@@ -80,11 +80,13 @@ function plotNext(curBout)
     on2 = bouts(curBout+1).onset_ind;
     bout1Off = bouts(curBout).offset;
     bout2On = bouts(curBout+1).onset;
+    tdif = bout2On - bout1Off;
     plot(data.tvec(off1-1000:on2+1000),data.raw_voltage(off1-1000:on2+1000))
     hold on;
     plot([bout1Off bout1Off],[0 1000],'k')
     plot([bout2On bout2On],[0 1000],'g')
     ylim([0 dataMax])
+    title(['\Delta t = ' num2str(tdif)])
     hold off;
 end
 uiwait;
