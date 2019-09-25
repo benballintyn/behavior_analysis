@@ -1,4 +1,17 @@
 function [bouts] = getBouts2(licks,thresh)
+% getBouts2
+%   Inputs:
+%       licks - licks from one channel. e.g. licks{1} if licks is the cell
+%               array returned from analysis_wrapper.
+%
+%       thresh - maximum amount of time, in seconds, that licks can be
+%                separated by and still be in the same bout. I have been
+%                using 1.5s as the thresh but allowing bouts of separation
+%                <2s to be joined.
+%
+%   Outputs:
+%       bouts - struct array containing all the bouts found from the licks
+%               input
 if (isempty(licks))
     bouts = [];
     return

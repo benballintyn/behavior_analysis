@@ -1,6 +1,7 @@
 function [lickNet] = retrainLickNet(netType,dates,animals,batchSize)
-[Xtr,Ytr,Xval,Yval,Xtst,Ytst] = convertLicks2LSTMinput('data',dates,animals,2000,.5);
-
+disp('creating input from data ...')
+[Xtr,Ytr,Xval,Yval,Xtst,Ytst] = convertLicks2LSTMinput('data',dates,animals,3000,.5);
+disp('input created ...')
 nbatches = ceil(length(Xtr)/batchSize);
 i=1;
 initialLearnRate = .000005;
@@ -37,6 +38,7 @@ while i < nbatches
         end
         i = i+1;
     catch err
+        err
         warning('That annoying bug happened')
         continue;
     end

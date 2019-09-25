@@ -1,4 +1,20 @@
 function [data] = read_datafiles(basedir,date,animal)
+% read_datafiles
+%   This function takes as input the relevant info about the date and
+%   animal of the data to be extracted. It then reads the information in
+%   the relevant data (.txt) files into a struct array of length nChannels
+%   where nChannels is the number of channels (and number of data files)
+%
+%   Inputs:
+%       basedir - top level directory containg all animal data
+%
+%       date - date in 'year/month/day' format of the data to be analyzed
+%
+%       animal - name of animal to be analyzed. e.g. 'bb8'
+%
+%   Outputs:
+%       data - struct array (with 1 entry per channel) containing raw and
+%              filtered data
 datadir = [basedir '/' date '/' animal];
 datafiles = dir([datadir '/' date animal '*.txt']);
 expt_start = 5; % baseline for 5 minutes in or 300 seconds

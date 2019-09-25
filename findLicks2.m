@@ -1,6 +1,15 @@
 function [good_licks] = findLicks2(data)
+% findLicks2
+%   Finds crossings of a voltage threshold in the raw voltage recordings
+%   and marks the onset/offset of licks
+%   Inputs:
+%       data - structure array returned from read_datafiles
+%
+%   Outputs:
+%       good_licks - cell array, of same length as data, of struct arrays
+%       with each struct being a lick
 b = find(data.tvec < 300);
-min_thresh = ceil(mean(data.raw_voltage(b))) + 20*std(data.raw_voltage(b));
+min_thresh = ceil(mean(data.raw_voltage(b))) + 10*std(data.raw_voltage(b)); % had at 20std
 ema_thresh = getEMA(data.smoothed_voltage,.05);
 inlick = 0;
 nlicks=0;

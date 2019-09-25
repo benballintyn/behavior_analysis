@@ -1,4 +1,30 @@
 function [data,licks,bouts,states] = analysis_wrapper(basedir,date,animal,redo)
+% analysis_wrapper
+%   Inputs:
+%       basedir - top level directory containing the data to be analyzed
+%
+%       date - date in 'yr/month/day' format of the data to be analyzed
+%
+%       animal - name of animal to be analyzed e.g. 'bb8'
+%
+%       redo - 'yes' or 'no'. 'yes' to reanalyze data. 'no' to just load
+%              previously analyzed data
+%
+%   Outputs:
+%       data - struct array with one entry for each data channel
+%
+%       licks - cell array of struct arrays. Length of the cell array is
+%               the same length as data. Each struct represents 1 lick on
+%               that channel
+%
+%       bouts - cell array of struct arrays. Each struct array contains all
+%               of the bouts on that channel
+%
+%       states - matrix of size(length(data)+1,36000) containing a
+%                downsampled sequence of the 'states' of the animal during
+%                that session. State == 1 indicates the animal is
+%                'wandering'. State == 2 indicates the animal is at
+%                solution 1 and so on.
 savedir = [basedir '/' date '/' animal];
 if (~exist([savedir '/states.mat'],'file') || strcmp(redo,'yes'))
     [data] = read_datafiles(basedir,date,animal);

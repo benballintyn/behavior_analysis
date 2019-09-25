@@ -1,21 +1,45 @@
 function [licks] = addLicks(data,licks,savedir,allLicks,chan)
-datalength = length(data.raw_voltage);
-wndwSize = 2000;
-nwndws = ceil(datalength/wndwSize);
-dataMax = max(data.raw_voltage);
+% addLicks Manually add licks to an existing set for one channel on one day
+%       Inputs:
+%           data - 1 entry from the data array for a particular day. e.g.
+%                  data(1)
+%
+%           licks - 1 entry from the licks cell array for a particular day
+%                   e.g. licks{1}
+%
+%           savedir - directory into which to save the modified licks file
+%                     e.g. data/190801/bb8
+%
+%           allLicks - full licks cell array for a particular day
+%
+%           chan - index (1-3 depending on if it is a 2-bottle or 3-bottle
+%                  task) from which the current data and licks were taken.
+%                  e.g. if data and licks inputs come from data(1) and
+%                  licks{1} then chan should be 1
+%
+%       Outputs:
+%           licks - modified struct array containing prior and new licks
+datalength = length(data.raw_voltage); % # of timesteps in raw_voltage
+wndwSize = 2000; % size of window to display in # of timesteps
+nwndws = ceil(datalength/wndwSize); % total # of windows to display
+dataMax = max(data.raw_voltage); % maximum raw_voltage value
 
-onsetLineInds = [];
-offsetLineInds = [];
-nNew = 0;
-speedFactor = 1;
-offset = 0;
+onsetLineInds = []; % array to store onset times of new licks
+offsetLineInds = []; % array to store offset times of new licks
+nNew = 0; % # of new licks
+speedFactor = 1; % # of indices to move for left/right commands
+offset = 0; % variable that stores how far left/right the user has moved the current window
 h = figure;
 set(h,'KeyPressFcn',@KeyPressCb);
 set(h,'Position',[200 200 1600 1000])
 wndwNum = 1;
-plotWindow(wndwNum);
+plotWindow(wndwNum); % plot the first window
+
+% callback function that listens for key presses
 function KeyPressCb(~,evnt)
     fprintf('key pressed: %s\n',evnt.Key);
+    % move to the previous window and eliminate all new licks in this
+    % window (that have not yet been accepted)
     if strcmpi(evnt.Key,'leftarrow')
         onsetLineInds = [];
         offsetLineInds = [];
@@ -23,6 +47,8 @@ function KeyPressCb(~,evnt)
         offset = 0;
         wndwNum = max(1,wndwNum-1);
         plotWindow(wndwNum)
+    % Accept all new licks in the current window and add them to the lick
+    % array
     elseif strcmpi(evnt.Key,'rightarrow')
         if (length(onsetLineInds) ~= length(offsetLineInds))
             error('Unequal numbers of onset and offset indices for new licks')
@@ -60,46 +86,60 @@ function KeyPressCb(~,evnt)
         offset = 0;
         wndwNum = min(wndwNum+1,nwndws);
         plotWindow(wndwNum)
+    % create the onset and offset lines for a new lick
     elseif strcmpi(evnt.Key,'n')
         nNew = nNew+1;
         mid_ind=makeOnsetOffsetLines(wndwNum);
         onsetLineInds = [onsetLineInds mid_ind-1];
         offsetLineInds = [offsetLineInds mid_ind+1];
         plotWindow(wndwNum)
+    % move the current onset line speedFactor indices to the left
     elseif strcmpi(evnt.Key,'q')
         if (nNew > 0)
             onsetLineInds(nNew) = onsetLineInds(nNew)-speedFactor;
             plotWindow(wndwNum)
         end
+    % move the current onset line speedFactor indices to the right
     elseif strcmpi(evnt.Key,'w')
         if (nNew > 0)
             onsetLineInds(nNew) = onsetLineInds(nNew)+speedFactor;
             plotWindow(wndwNum)
         end
+    % move the current offset line speedFactor indices to the left
     elseif strcmpi(evnt.Key,'a')
         if (nNew > 0)
             offsetLineInds(nNew) = offsetLineInds(nNew)-speedFactor;
             plotWindow(wndwNum)
         end
+    % move the current offset line speedFactor indices to the right
     elseif strcmpi(evnt.Key,'s')
         if (nNew > 0)
             offsetLineInds(nNew) = offsetLineInds(nNew)+speedFactor;
             plotWindow(wndwNum)
         end
+    % accepts any of the number keys as input (0-9) and sets that to be the
+    % new speedFactor
     elseif ~isempty(regexp(evnt.Key,'\d','ONCE'))
         speedFactor = str2double(evnt.Key);
+    % shift the window left by speedFactor indices
     elseif strcmpi(evnt.Key,'z')
         offset = offset - speedFactor;
         plotWindow(wndwNum)
+    % shift the window right by speedFactor indices
     elseif strcmpi(evnt.Key,'x')
         offset = offset + speedFactor;
         plotWindow(wndwNum)
+    % takes the current lick array (with any new licks that have been
+    % accepted) and adds them to the full lick cell array and saves that.
+    % This can be used to save progress as you go along but note that this
+    % WILL overwrite the preexisting lick.mat file
     elseif strcmpi(evnt.Key,'tab')
         disp('saving current progress...')
         allLicks{chan} = licks;
         licks = allLicks;
         save([savedir '/licks.mat'],'licks','-mat')
         licks = allLicks{chan};
+    % Hit enter/return to finish adding licks
     elseif strcmpi(evnt.Key,'return')
         close all;
         return;

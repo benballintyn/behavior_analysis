@@ -1,7 +1,11 @@
-function [data,licks,bouts,states] = lstmLickAnalysis(basedir,date,animal,redo)
-savedir = [basedir '/' date '/' animal];
+function [data,licks,bouts,states] = lstmLickAnalysis(basedir,dataDate,animal,redo)
+savedir = [basedir '/' dataDate '/' animal];
 if (~exist([savedir '/states.mat'],'file') || strcmp(redo,'yes'))
-    [data] = read_datafiles(basedir,date,animal);
+    if (exist([savedir '/licks.mat'],'file'))
+        licks = load([savedir '/licks.mat']); licks=licks.licks;
+        save([savedir '/oldLicks.mat'],'licks','-mat')
+    end
+    [data] = read_datafiles(basedir,dataDate,animal);
     save([savedir '/data.mat'],'data','-mat')
     [licks] = findLicksWithLSTM(data,'yes');
     save([savedir '/licks.mat'],'licks','-mat')
@@ -22,6 +26,7 @@ else
     licks = load([savedir '/licks.mat']); licks=licks.licks;
     bouts = load([savedir '/bouts.mat']); bouts=bouts.bouts;
     states = load([savedir '/states.mat']); states=states.states;
+    save([savedir '/oldLicks.mat'],'licks','-mat')
     for i=1:length(data)
         [nl] = manualLickID(data(i),licks{i});
         newlicks{i} = nl;

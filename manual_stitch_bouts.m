@@ -1,4 +1,14 @@
 function [newbouts] = manual_stitch_bouts(data,bouts)
+% manual_stitch_bouts
+%   Manually determine whether adjacent bouts should be joined
+%   Inputs:
+%       data - struct containing the data from one of the channels
+%
+%       bouts - struct array containing all of the bouts from one channel
+%
+%   Outputs:
+%       newbouts - modified struct array containing the bouts as determined
+%                  by manual correction.
 dataMax = max(data.raw_voltage);
 nGood = 0;
 curBout = 1;
@@ -11,13 +21,17 @@ bout2On = bouts(curBout+1).onset;
 tempBout = struct();
 oldTempBout = struct();
 lastKey = '';
+
 h=figure;
 set(h,'KeyPressFcn',@KeyPressCb);
+%{
 plot(data.tvec(off1-1000:on2+1000),data.raw_voltage(off1-1000:on2+1000))
 hold on;
 plot([bout1Off bout1Off],[0 1000],'k')
 plot([bout2On bout2On],[0 1000],'g')
 hold off;
+%}
+plotNext(curBout)
 function KeyPressCb(~,evnt)
     %fprintf('key pressed: %s\n',evnt.Key);
     if strcmpi(evnt.Key,'leftarrow')
@@ -34,19 +48,19 @@ function KeyPressCb(~,evnt)
     elseif strcmpi(evnt.Key,'rightarrow')
         oldTempBout = tempBout;
         if (isempty(fieldnames(tempBout)))
-            tempBout.nlicks = bouts(curBout).nlicks;
-            tempBout.licks = bouts(curBout).licks;
+            tempBout.nlicks = bouts(curBout).nlicks + bouts(curBout+1).nlicks;
+            tempBout.licks = [bouts(curBout).licks bouts(curBout+1).licks];
             tempBout.onset = bouts(curBout).onset;
             tempBout.onset_ind = bouts(curBout).onset_ind;
-            tempBout.offset = bouts(curBout).offset;
-            tempBout.offset_ind = bouts(curBout).offset_ind;
+            tempBout.offset = bouts(curBout+1).offset;
+            tempBout.offset_ind = bouts(curBout+1).offset_ind;
             tempBout.duration = tempBout.offset - tempBout.onset;
             tempBout.solution = bouts(curBout).solution;
         else
             tempBout.nlicks = tempBout.nlicks + bouts(curBout).nlicks;
             tempBout.licks = [tempBout.licks bouts(curBout).licks];
-            tempBout.offset = bouts(curBout).offset;
-            tempBout.offset_ind = bouts(curBout).offset_ind;
+            tempBout.offset = bouts(curBout+1).offset;
+            tempBout.offset_ind = bouts(curBout+1).offset_ind;
             tempBout.duration = tempBout.offset - tempBout.onset;
         end
         curBout = curBout+1;

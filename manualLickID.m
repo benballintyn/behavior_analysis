@@ -1,9 +1,30 @@
 function [newlicks] = manualLickID(data,licks)
+% manualLickID
+%   Inputs:
+%       data - one entry in the structure array returned from read_datafiles
+%              e.g. data(1)
+%
+%       licks - struct array holding all the licks from one channel
+%       lick
+%
+%   Outputs:
+%       newlicks - modified struct array with some licks removed manually
+%   Key commands:
+%       <- (leftarrow): reject a lick
+%       -> (rightarrow): accept a lick
+%       downarrow: go back a lick (and remove it from accepted licks if it
+%                  was accepted
+%       q: shift lick onset back by 1 timestep
+%       w: shift lick onset forward by 1 timestep
+%       a: shift lick offset back by 1 timestep
+%       s: shift lick offset forward by 1 timestep
+%       
 dataMax = max(data.raw_voltage);
 nGood = 0;
 curLick = 1;
 dataOffset = 1000;
 good_licks = [];
+offsetAdjustment = 0;
 h=figure;
 set(h,'KeyPressFcn',@KeyPressCb);
 set(h,'Position',[200 200 1600 1000])
@@ -77,6 +98,22 @@ function KeyPressCb(~,evnt)
         licks(curLick).offset = data.tvec(licks(curLick).offset_ind);
         licks(curLick).offsetVal = data.raw_voltage(licks(curLick).offset_ind);
         plotNext(curLick)
+    %{
+    elseif strcmpi(evnt.Key,'f')
+        offsetAdjustment = offsetAdjustment - 1;
+        for i=curLick:length(licks)
+            licks(i).offset_ind = licks(i).offset_ind-offsetAdjustment;
+            licks(i).offset = data.tvec(licks(i).offset_ind);
+        end
+        plotNext(curLick)
+    elseif strcmpi(evnt.Key,'g')
+        offsetAdjustment = offsetAdjustment + 1;
+        for i=curLick:length(licks)
+            licks(i).offset_ind = licks(i).offset_ind+offsetAdjustment;
+            licks(i).offset = data.tvec(licks(i).offset_ind);
+        end
+        plotNext(curLick)
+    %}
     end  
 end
 function plotNext(curLick)
