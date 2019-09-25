@@ -1,4 +1,32 @@
 function [data,licks,bouts,states] = lstmLickAnalysis(basedir,dataDate,animal,redo)
+% lstmLickAnalysis
+%   This function uses a trained LSTM (Long-Short-Term Memory) deep network
+%   to identify licks from the raw data.
+%
+%   Inputs:
+%       basedir - top level directory containing all of the animal data
+%
+%       dataDate - date of the day to be analyzed. e.g. '190808'
+%
+%       animal - name of the animal to be analyzed. e.g. 'bb8'
+%
+%       redo - 'yes' or 'no'. 'yes' to reanalyze data.
+%
+%   Outputs:
+%       data - struct array with one entry for each data channel
+%
+%       licks - cell array of struct arrays. Length of the cell array is
+%               the same length as data. Each struct represents 1 lick on
+%               that channel
+%
+%       bouts - cell array of struct arrays. Each struct array contains all
+%               of the bouts on that channel
+%
+%       states - matrix of size(length(data)+1,36000) containing a
+%                downsampled sequence of the 'states' of the animal during
+%                that session. State == 1 indicates the animal is
+%                'wandering'. State == 2 indicates the animal is at
+%                solution 1 and so on.
 savedir = [basedir '/' dataDate '/' animal];
 if (~exist([savedir '/states.mat'],'file') || strcmp(redo,'yes'))
     if (exist([savedir '/licks.mat'],'file'))
