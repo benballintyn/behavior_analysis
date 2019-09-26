@@ -9,6 +9,10 @@ function [newbouts] = manual_stitch_bouts(data,bouts)
 %   Outputs:
 %       newbouts - modified struct array containing the bouts as determined
 %                  by manual correction.
+if (isempty(bouts))
+    newbouts = [];
+    return;
+end
 dataMax = max(data.raw_voltage);
 nGood = 0;
 curBout = 1;

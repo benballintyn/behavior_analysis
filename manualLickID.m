@@ -18,7 +18,11 @@ function [newlicks] = manualLickID(data,licks)
 %       w: shift lick onset forward by 1 timestep
 %       a: shift lick offset back by 1 timestep
 %       s: shift lick offset forward by 1 timestep
-%       
+%
+if (isempty(licks))
+    newlicks = [];
+    return;
+end
 dataMax = max(data.raw_voltage);
 nGood = 0;
 curLick = 1;

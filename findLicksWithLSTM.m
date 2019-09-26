@@ -27,7 +27,7 @@ for i=1:nbatches
     else
         end_ind = i*subsetLength;
     end
-    [lickNet,lickprobs] = predictAndUpdateState(lickNet,X(:,start_ind:end_ind));
+    [lickNet,lickprobs] = predictAndUpdateState(lickNet,X(:,start_ind:end_ind),'ExecutionEnvironment','gpu');
     lickProbs = [lickProbs lickprobs];
 end
 [~,maxVec] = max(lickProbs,[],1);
@@ -85,12 +85,16 @@ for i=1:length(refinedLicks)
     end
 end
 if (strcmp(manualCorrection,'yes'))
-    for i=1:length(licks)
-        %[~,sortedInds] = sort([licks{i}.certainty]);
-        %[newlicks] = manualLickID(data(i),licks{i}(sortedInds));
-        %[~,sortedOrder] = sort([newlicks.onset]);
-        %goodlicks{i} = newlicks(sortedOrder);
-        goodlicks{i} = manualLickID(data(i),validLicks{i});
+    if (isempty(validLicks))
+        goodlicks = [];
+    else
+        for i=1:length(licks)
+            %[~,sortedInds] = sort([licks{i}.certainty]);
+            %[newlicks] = manualLickID(data(i),licks{i}(sortedInds));
+            %[~,sortedOrder] = sort([newlicks.onset]);
+            %goodlicks{i} = newlicks(sortedOrder);
+            goodlicks{i} = manualLickID(data(i),validLicks{i});
+        end
     end
 else
     goodlicks = validLicks;
