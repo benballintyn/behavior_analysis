@@ -28,12 +28,15 @@ end
 for i=1:size(paramVals,2)
     X(:,i) = paramVals(:,i);%/(info.upper_bounds(i) - info.lower_bounds(i));
 end
+[minscore,minind] = min(scores);
 [COEFF, SCORE, LATENT, TSQUARED, EXPLAINED, MU] = pca(X);
 cmap=jet;
 colorScale = ceil(max(scores))/size(cmap,1);
 colorInds = ceil(scores/colorScale);
 figure;
 scatter3(paramVals*COEFF(:,1),paramVals*COEFF(:,2),paramVals*COEFF(:,3),[],cmap(colorInds,:),'filled')
+hold on;
+scatter3(paramVals(minind,:)*COEFF(:,1),paramVals(minind,:)*COEFF(:,2),paramVals(minind,:)*COEFF(:,3),200,'r*')
 colormap(cmap); colorbar(); caxis([0 ceil(max(scores))])
 xlabel('PC 1'); ylabel('PC 2'); zlabel('PC 3')
 figure;

@@ -1,4 +1,4 @@
-function [newlicks] = manualLickID(data,licks)
+function [newlicks] = manualLickID(data,licks,savedir,allLicks,chan)
 % manualLickID
 %   Inputs:
 %       data - one entry in the structure array returned from read_datafiles
@@ -102,22 +102,13 @@ function KeyPressCb(~,evnt)
         licks(curLick).offset = data.tvec(licks(curLick).offset_ind);
         licks(curLick).offsetVal = data.raw_voltage(licks(curLick).offset_ind);
         plotNext(curLick)
-    %{
-    elseif strcmpi(evnt.Key,'f')
-        offsetAdjustment = offsetAdjustment - 1;
-        for i=curLick:length(licks)
-            licks(i).offset_ind = licks(i).offset_ind-offsetAdjustment;
-            licks(i).offset = data.tvec(licks(i).offset_ind);
-        end
-        plotNext(curLick)
-    elseif strcmpi(evnt.Key,'g')
-        offsetAdjustment = offsetAdjustment + 1;
-        for i=curLick:length(licks)
-            licks(i).offset_ind = licks(i).offset_ind+offsetAdjustment;
-            licks(i).offset = data.tvec(licks(i).offset_ind);
-        end
-        plotNext(curLick)
-    %}
+    elseif strcmpi(evnt.Key,'tab')
+        disp('saving current progress')
+        allLicks{chan} = newlicks;
+        oldLicks = licks;
+        licks = allLicks;
+        save([savedir '/licks.mat'],'licks','-mat')
+        licks = oldLicks;
     end  
 end
 function plotNext(curLick)

@@ -8,9 +8,9 @@ function [data,newlicks,bouts,states] = manual_wrapper(basedir,date,animal,redo)
 %
 %       animal - animal ID to be analyzed e.g. 'bb8'
 %
-%       redo - 'yes' or 'no'. 'yes' in order to go through the the full
+%       redo - 'yes', 'no', or 'continue'. 'yes' in order to go through the the full
 %       analysis process straight from raw data. 'no' to load previously
-%       analyzed data and licks and manually correct them
+%       analyzed data and licks and manually correct them.
 %
 %   Outputs:
 %       data - struct array containing the raw data for each channel for 1
@@ -26,7 +26,7 @@ savedir = [basedir '/' date '/' animal];
 if (~exist([savedir '/states.mat'],'file') || strcmp(redo,'yes'))
     [data,licks,bouts,states] = analysis_wrapper(basedir,date,animal,'yes');
     for i=1:length(data)
-        [nl] = manualLickID(data(i),licks{i});
+        [nl] = manualLickID(data(i),licks{i},savedir,licks,i);
         newlicks{i} = nl;
         tempBout = getBouts2(nl,1.5);
         newbouts = manual_stitch_bouts(data(i),tempBout);
@@ -48,7 +48,7 @@ else
     bouts = load([savedir '/bouts.mat']); bouts=bouts.bouts;
     states = load([savedir '/states.mat']); states=states.states;
     for i=1:length(data)
-        [nl] = manualLickID(data(i),licks{i});
+        [nl] = manualLickID(data(i),licks{i},savedir,licks,i);
         newlicks{i} = nl;
         bouts{i} = getBouts2(nl,1.5);
     end
