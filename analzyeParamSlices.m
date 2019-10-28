@@ -17,7 +17,7 @@ for i=1:length(paramNames)
             [Xq,Yq] = meshgrid(xrange,yrange);
             Vq = F(Xq,Yq);
             figure;
-            imagesc([xmin xmax],[ymin ymax],Vq); colormap(jet); colorbar(); caxis([0 ceil(max(scores))])
+            imagesc([xmin xmax],[ymin ymax],Vq); colormap(jet); colorbar(); caxis([floor(min(scores)) ceil(max(scores))])
             set(gca,'ydir','normal')
             xlabel(paramNames{i}); ylabel(paramNames{j})
             hold on; plot(paramVals(:,i),paramVals(:,j),'.k','markersize',10)
@@ -29,15 +29,17 @@ for i=1:size(paramVals,2)
     X(:,i) = paramVals(:,i);%/(info.upper_bounds(i) - info.lower_bounds(i));
 end
 [minscore,minind] = min(scores);
+mininds = find(scores == minscore);
 [COEFF, SCORE, LATENT, TSQUARED, EXPLAINED, MU] = pca(X);
 cmap=jet;
-colorScale = ceil(max(scores))/size(cmap,1);
-colorInds = ceil(scores/colorScale);
+colorScale = ceil((max(scores) - min(scores)))/size(cmap,1);
+colorInds = ceil(((scores - min(scores)))/colorScale);
+colorInds(mininds) = 1;
 figure;
 scatter3(paramVals*COEFF(:,1),paramVals*COEFF(:,2),paramVals*COEFF(:,3),[],cmap(colorInds,:),'filled')
 hold on;
 scatter3(paramVals(minind,:)*COEFF(:,1),paramVals(minind,:)*COEFF(:,2),paramVals(minind,:)*COEFF(:,3),200,'r*')
-colormap(cmap); colorbar(); caxis([0 ceil(max(scores))])
+colormap(cmap); colorbar(); caxis([floor(min(scores)) ceil(max(scores))])
 xlabel('PC 1'); ylabel('PC 2'); zlabel('PC 3')
 figure;
 plot(EXPLAINED)
@@ -51,6 +53,12 @@ figure;
 imagesc(X(inds,:))
 set(gca,'xtick',1:size(paramVals,2),'xticklabel',paramNames)
 colormap(jet); colorbar()
+
+meanParamVals = mean(paramVals,1);
+stdParamVals = std(paramVals,[],1);
+standardizedParamVals = (paramVals - meanParamVals)./stdParamVals;
+standardizedScores = (scores - mean(scores))/std(scores);
+[b,bint,r,rint,stats] = regress(standardizedScores',[standardizedParamVals ones(size(standardizedParamVals,1),1)]);
 
 end
 
