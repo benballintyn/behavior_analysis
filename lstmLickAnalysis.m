@@ -48,6 +48,7 @@ if (~exist([savedir '/states.mat'],'file') || strcmp(redo,'yes'))
     manual_flag.done = 1;
     manual_flag.date = date;
     save([savedir '/manual_flag.mat'],'manual_flag','-mat')
+    [data] = labelDataWithChannels(basedir,dataDate,animal);
 else
     disp(['previous analysis present in ' savedir '. loading...'])
     data = load([savedir '/data.mat']); data=data.data;

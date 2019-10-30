@@ -17,7 +17,7 @@ for i=1:length(paramNames)
             [Xq,Yq] = meshgrid(xrange,yrange);
             Vq = F(Xq,Yq);
             figure;
-            imagesc([xmin xmax],[ymin ymax],Vq); colormap(jet); colorbar(); caxis([0 ceil(max(scores))])
+            imagesc([xmin xmax],[ymin ymax],Vq); colormap(jet); colorbar(); caxis([floor(min(scores)) ceil(max(scores))])
             set(gca,'ydir','normal')
             xlabel(paramNames{i}); ylabel(paramNames{j})
             hold on; plot(paramVals(:,i),paramVals(:,j),'.k','markersize',10)
@@ -32,9 +32,10 @@ end
 cmap=jet;
 colorScale = ceil(max(scores))/size(cmap,1);
 colorInds = ceil(scores/colorScale);
+colorInds
 figure;
 scatter3(paramVals*COEFF(:,1),paramVals*COEFF(:,2),paramVals*COEFF(:,3),[],cmap(colorInds,:),'filled')
-colormap(cmap); colorbar(); caxis([0 ceil(max(scores))])
+colormap(cmap); colorbar(); caxis([floor(min(scores)) ceil(max(scores))])
 xlabel('PC 1'); ylabel('PC 2'); zlabel('PC 3')
 figure;
 plot(EXPLAINED)

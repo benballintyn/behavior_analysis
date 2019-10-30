@@ -1,4 +1,4 @@
-function [] = addLicksAndCorrect(basedir,date,animal)
+function [] = addLicksAndCorrect(basedir,date,animal,varargin)
 %   addLicksAndCorrect Go through all channels for a day and manually add
 %                      licks
 %
@@ -19,7 +19,11 @@ else
 end
 % For each channel manually add licks
 for i=1:length(licks)
-    licks{i} = addLicks(data(i),licks{i},savedir,licks,i);
+    if (~isempty(varargin))
+        licks{i} = addLicks(data(i),licks{i},savedir,licks,i,varargin{1});
+    else
+        licks{i} = addLicks(data(i),licks{i},savedir,licks,i);
+    end
 end
 save([savedir '/licks.mat'],'licks','-mat') % save manually modified licks
 % For each channel, identify new bouts based on modified licks and manually

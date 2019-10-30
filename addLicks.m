@@ -1,4 +1,4 @@
-function [licks] = addLicks(data,licks,savedir,allLicks,chan)
+function [licks] = addLicks(data,licks,savedir,allLicks,chan,varargin)
 % addLicks Manually add licks to an existing set for one channel on one day
 %       Inputs:
 %           data - 1 entry from the data array for a particular day. e.g.
@@ -73,7 +73,11 @@ function KeyPressCb(~,evnt)
             tmpLick.maxVal = maxVal;
             tmpLick.solution = data.solution;
             tmpLick.certainty = NaN;
-            laterLickInds = find([licks.onset] > tmpLick.offset);
+            if (isempty(licks))
+                laterLickInds = [];
+            else
+                laterLickInds = find([licks.onset] > tmpLick.offset);
+            end
             if (isempty(laterLickInds))
                 licks = [licks tmpLick];
             else
@@ -89,11 +93,29 @@ function KeyPressCb(~,evnt)
     % create the onset and offset lines for a new lick
     elseif strcmpi(evnt.Key,'n')
         nNew = nNew+1;
+        if (~isempty(licks))
+            meanLickDurs = [licks.offset_ind]-[licks.onset_ind];
+            meanLickDur = ceil(mean(meanLickDurs(meanLickDurs < 500)));
+        else
+            meanLickDur = 60;
+        end
         mid_ind=makeOnsetOffsetLines(wndwNum);
-        onsetLineInds = [onsetLineInds mid_ind-1];
-        offsetLineInds = [offsetLineInds mid_ind+1];
+        onsetLineInds = [onsetLineInds mid_ind];
+        offsetLineInds = [offsetLineInds mid_ind+meanLickDur];
         plotWindow(wndwNum)
     % move the current onset line speedFactor indices to the left
+    elseif strcmpi(evnt.Key,'e')
+        if (nNew > 0)
+            onsetLineInds(nNew) = onsetLineInds(nNew)-speedFactor;
+            offsetLineInds(nNew) = offsetLineInds(nNew)-speedFactor;
+            plotWindow(wndwNum)
+        end
+    elseif strcmpi(evnt.Key,'r')
+        if (nNew > 0)
+            onsetLineInds(nNew) = onsetLineInds(nNew)+speedFactor;
+            offsetLineInds(nNew) = offsetLineInds(nNew)+speedFactor;
+            plotWindow(wndwNum)
+        end
     elseif strcmpi(evnt.Key,'q')
         if (nNew > 0)
             onsetLineInds(nNew) = onsetLineInds(nNew)-speedFactor;
@@ -149,8 +171,16 @@ end
 function plotWindow(wndwNum)
     start_ind = (wndwNum-1)*wndwSize + 1 + offset;
     end_ind = min(datalength,wndwNum*wndwSize+offset);
-    includedLickInds = find([licks.onset_ind] >= start_ind & [licks.onset_ind] <= end_ind);
-    plot(data.tvec(start_ind:end_ind),data.raw_voltage(start_ind:end_ind))
+    if (~isempty(licks))
+        includedLickInds = find([licks.onset_ind] >= start_ind & [licks.onset_ind] <= end_ind);
+    else
+        includedLickInds = [];
+    end
+    if (~isempty(varargin))
+        plot(data.tvec(start_ind:end_ind),data.(varargin{1})(start_ind:end_ind))
+    else
+        plot(data.tvec(start_ind:end_ind),data.raw_voltage(start_ind:end_ind))
+    end
     hold on;
     for i=1:length(includedLickInds)
         curLick = includedLickInds(i);
@@ -183,7 +213,15 @@ function mid_ind=makeOnsetOffsetLines(wndwNum)
         end_ind = min(datalength,wndwNum*wndwSize);
         mid_ind = floor((end_ind + start_ind + 1)/2);
     else
-        mid_ind = offsetLineInds(end)+5;
+        if (~isempty(licks))
+            onsets = [licks.onset_ind];
+            offsets = [licks.offset_ind];
+            ilis = onsets(2:end) - offsets(1:end-1);
+            meanILI = ceil(mean(ilis(ilis < 500)));
+            mid_ind = offsetLineInds(end)+meanILI;
+        else
+            mid_ind = offsetLineInds(end)+200;
+        end
     end
 end
 uiwait;

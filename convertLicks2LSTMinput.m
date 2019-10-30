@@ -3,7 +3,7 @@ totalDataPoints = 0;
 for i=1:length(dates)
     for j=1:length(animals)
         curdir = [basedir '/' dates{i} '/' animals{j}];
-        if (exist(curdir,'dir'))
+        if (exist(curdir,'dir') && exist([curdir '/licks.mat'],'file'))
             data=load([curdir '/data.mat']); data=data.data;
             licks=load([curdir '/licks.mat']); licks=licks.licks;
             dataLength = length(data(1).raw_voltage);
@@ -12,10 +12,12 @@ for i=1:length(dates)
             startOffset = ceil(fracOverlap*wndwLength);
             npts = 1 + (dataLength - wndwLength)/overlapLength;
             for k=1:length(licks)
-                onsets = [licks{k}.onset_ind];
-                offsets = [licks{k}.offset_ind];
-                for l=1:length(onsets)
-                    lickVec(onsets(l):offsets(l)) = k+1;
+                if (~isempty(licks{k}))
+                    onsets = [licks{k}.onset_ind];
+                    offsets = [licks{k}.offset_ind];
+                    for l=1:length(onsets)
+                        lickVec(onsets(l):offsets(l)) = k+1;
+                    end
                 end
             end
             for k=1:npts

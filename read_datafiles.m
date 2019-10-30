@@ -9,6 +9,7 @@ function [data] = read_datafiles(basedir,date,animal)
 %       basedir - top level directory containg all animal data
 %
 %       date - date in 'year/month/day' format of the data to be analyzed
+%       e.g. '190808'
 %
 %       animal - name of animal to be analyzed. e.g. 'bb8'
 %
