@@ -1,5 +1,4 @@
-function [reducedStateVec] = makeReducedStateSeq(basedir,date,animal)
-expStartOffset = 300;
+function [reducedStateVec] = makeReducedStateSeq(basedir,date,animal,exptStartOffset)
 curdir = [basedir '/' date '/' animal];
 metadata = load([curdir '/metadata.mat']); metadata=metadata.metadata;
 lchan = metadata.leftChannel;
@@ -23,8 +22,8 @@ reducedStateVec = ones(1,36000);
 for i=1:length(order)
     curBoutInd = find(order == i);
     for j=1:length(bouts{curBoutInd})
-        t1 = round((bouts{curBoutInd}(j).onset-expStartOffset)/.1);
-        t2 = round((bouts{curBoutInd}(j).offset-expStartOffset)/.1);
+        t1 = round((bouts{curBoutInd}(j).onset-exptStartOffset)/.1);
+        t2 = round((bouts{curBoutInd}(j).offset-exptStartOffset)/.1);
         if ((t2 - t1) < .1)
             reducedStateVec(t1) = i+1;
         else

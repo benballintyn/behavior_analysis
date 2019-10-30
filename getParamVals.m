@@ -13,6 +13,8 @@ for i=1:length(files)
             if (exist([datadir '/' num2str(count) '/subscores.mat'],'file'))
                 ss = load([datadir '/' num2str(count) '/subscores.mat']); ss=ss.subscores;
                 subscores(count,:) =  ss;
+            else
+                subscores = [];
             end
         else
             count=count-1;
