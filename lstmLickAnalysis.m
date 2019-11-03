@@ -35,7 +35,7 @@ if (~exist([savedir '/states.mat'],'file') || strcmp(redo,'yes'))
     end
     [data] = read_datafiles(basedir,dataDate,animal);
     save([savedir '/data.mat'],'data','-mat')
-    [licks] = findLicksWithLSTM(data,'yes');
+    [licks] = findLicksWithLSTM(data,'yes',savedir);
     save([savedir '/licks.mat'],'licks','-mat')
     for i=1:length(data)
         [bouts] = getBouts2(licks{i},1.5);

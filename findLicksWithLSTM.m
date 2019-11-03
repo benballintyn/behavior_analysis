@@ -1,4 +1,4 @@
-function [goodlicks] = findLicksWithLSTM(data,manualCorrection)
+function [goodlicks] = findLicksWithLSTM(data,manualCorrection,savedir)
 if (length(data) == 2)
     lickNet = load('analysis_code/bilstmLickNet2Bottle.mat'); lickNet=lickNet.bilstmLickNet;
     licks = cell(1,2);
@@ -93,7 +93,7 @@ if (strcmp(manualCorrection,'yes'))
             %[newlicks] = manualLickID(data(i),licks{i}(sortedInds));
             %[~,sortedOrder] = sort([newlicks.onset]);
             %goodlicks{i} = newlicks(sortedOrder);
-            goodlicks{i} = manualLickID(data(i),validLicks{i});
+            goodlicks{i} = manualLickID(data(i),validLicks{i},savedir,validLicks,i);
         end
     end
 else

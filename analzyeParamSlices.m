@@ -28,6 +28,7 @@ end
 for i=1:size(paramVals,2)
     X(:,i) = paramVals(:,i);%/(info.upper_bounds(i) - info.lower_bounds(i));
 end
+%{
 [minscore,minind] = min(scores);
 mininds = find(scores == minscore);
 [COEFF, SCORE, LATENT, TSQUARED, EXPLAINED, MU] = pca(X);
@@ -57,7 +58,7 @@ figure;
 imagesc(X(inds,:))
 set(gca,'xtick',1:size(paramVals,2),'xticklabel',paramNames)
 colormap(jet); colorbar()
-
+%}
 meanParamVals = mean(paramVals,1);
 stdParamVals = std(paramVals,[],1);
 standardizedParamVals = (paramVals - meanParamVals)./stdParamVals;
