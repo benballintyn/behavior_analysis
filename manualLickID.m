@@ -23,6 +23,7 @@ if (isempty(licks))
     newlicks = [];
     return;
 end
+speedFactor = 1;
 dataMax = max(data.raw_voltage);
 nGood = 0;
 curLick = 1;
@@ -73,42 +74,51 @@ function KeyPressCb(~,evnt)
         end
         plotNext(curLick)
     elseif strcmpi(evnt.Key,'q')
-        licks(curLick).onset_ind = licks(curLick).onset_ind-1;
+        licks(curLick).onset_ind = licks(curLick).onset_ind-speedFactor;
         licks(curLick).onset = data.tvec(licks(curLick).onset_ind);
         licks(curLick).onsetVal = data.raw_voltage(licks(curLick).onset_ind);
         plotNext(curLick)
     elseif strcmpi(evnt.Key,'w')
-        licks(curLick).onset_ind = licks(curLick).onset_ind+1;
+        licks(curLick).onset_ind = licks(curLick).onset_ind+speedFactor;
         licks(curLick).onset = data.tvec(licks(curLick).onset_ind);
         licks(curLick).onsetVal = data.raw_voltage(licks(curLick).onset_ind);
         plotNext(curLick)
     elseif strcmpi(evnt.Key,'z')
-        licks(curLick).maxInd = licks(curLick).maxInd-1;
+        licks(curLick).maxInd = licks(curLick).maxInd-speedFactor;
         licks(curLick).maxTime = data.tvec(licks(curLick).maxInd);
         licks(curLick).maxVal = data.raw_voltage(licks(curLick).maxInd);
         plotNext(curLick)
     elseif strcmpi(evnt.Key,'x')
-        licks(curLick).maxInd = licks(curLick).maxInd+1;
+        licks(curLick).maxInd = licks(curLick).maxInd+speedFactor;
         licks(curLick).maxTime = data.tvec(licks(curLick).maxInd);
         licks(curLick).maxVal = data.raw_voltage(licks(curLick).maxInd);
         plotNext(curLick)
     elseif strcmpi(evnt.Key,'a')
-        licks(curLick).offset_ind = licks(curLick).offset_ind-1;
+        licks(curLick).offset_ind = licks(curLick).offset_ind-speedFactor;
         licks(curLick).offset = data.tvec(licks(curLick).offset_ind);
         licks(curLick).offsetVal = data.raw_voltage(licks(curLick).offset_ind);
         plotNext(curLick)
     elseif strcmpi(evnt.Key,'s')
-        licks(curLick).offset_ind = licks(curLick).offset_ind+1;
+        licks(curLick).offset_ind = licks(curLick).offset_ind+speedFactor;
         licks(curLick).offset = data.tvec(licks(curLick).offset_ind);
         licks(curLick).offsetVal = data.raw_voltage(licks(curLick).offset_ind);
         plotNext(curLick)
+    elseif ~isempty(regexp(evnt.Key,'\d','ONCE'))
+        speedFactor = str2double(evnt.Key);
     elseif strcmpi(evnt.Key,'tab')
         disp('saving current progress')
-        allLicks{chan} = newlicks;
-        oldLicks = licks;
-        licks = allLicks;
-        save([savedir '/licks.mat'],'licks','-mat')
-        licks = oldLicks;
+        if (~isempty(good_licks))
+            maxGood = max(good_licks);
+            if (maxGood == length(licks))
+                allLicks{chan} = licks(good_licks);
+            else
+                allLicks{chan} = [licks(good_licks) licks(maxGood+1:end)];
+            end
+            oldLicks = licks;
+            licks = allLicks;
+            save([savedir '/licks.mat'],'licks','-mat')
+            licks = oldLicks;
+        end
     end  
 end
 function plotNext(curLick)

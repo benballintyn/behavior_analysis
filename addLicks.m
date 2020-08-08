@@ -73,6 +73,8 @@ function KeyPressCb(~,evnt)
             tmpLick.maxVal = maxVal;
             tmpLick.solution = data.solution;
             tmpLick.certainty = NaN;
+            tmpLick.box_side = data.box_side;
+            tmpLick.channel = data.channel;
             if (isempty(licks))
                 laterLickInds = [];
             else
@@ -103,19 +105,21 @@ function KeyPressCb(~,evnt)
         onsetLineInds = [onsetLineInds mid_ind];
         offsetLineInds = [offsetLineInds mid_ind+meanLickDur];
         plotWindow(wndwNum)
-    % move the current onset line speedFactor indices to the left
+    % move the current onset and offset lines speedFactor indices to the left
     elseif strcmpi(evnt.Key,'e')
         if (nNew > 0)
             onsetLineInds(nNew) = onsetLineInds(nNew)-speedFactor;
             offsetLineInds(nNew) = offsetLineInds(nNew)-speedFactor;
             plotWindow(wndwNum)
         end
+    % move the current onset and offset lines speedFactor indices to the right
     elseif strcmpi(evnt.Key,'r')
         if (nNew > 0)
             onsetLineInds(nNew) = onsetLineInds(nNew)+speedFactor;
             offsetLineInds(nNew) = offsetLineInds(nNew)+speedFactor;
             plotWindow(wndwNum)
         end
+    % move the current onset line speedFactor indices to the left
     elseif strcmpi(evnt.Key,'q')
         if (nNew > 0)
             onsetLineInds(nNew) = onsetLineInds(nNew)-speedFactor;

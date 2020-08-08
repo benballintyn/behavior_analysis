@@ -52,6 +52,9 @@ if (~exist([savedir '/states.mat'],'file') || strcmp(redo,'yes'))
 else
     disp(['previous analysis present in ' savedir '. loading...'])
     data = load([savedir '/data.mat']); data=data.data;
+    if (~isfield(data,'box_side'))
+        labelDataWithChannels(basedir,dataDate,animal);
+    end
     licks = load([savedir '/licks.mat']); licks=licks.licks;
     bouts = load([savedir '/bouts.mat']); bouts=bouts.bouts;
     states = load([savedir '/states.mat']); states=states.states;
@@ -60,6 +63,7 @@ else
         [nl] = manualLickID(data(i),licks{i});
         newlicks{i} = nl;
         bouts{i} = getBouts2(nl,1.5);
+        bouts{i} = manual_stitch_bouts(data(i),bouts{i});
     end
     [states] = get_behavior_states(bouts,data(1).tvec);
     licks = newlicks;

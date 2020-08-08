@@ -93,7 +93,11 @@ if (strcmp(manualCorrection,'yes'))
             %[newlicks] = manualLickID(data(i),licks{i}(sortedInds));
             %[~,sortedOrder] = sort([newlicks.onset]);
             %goodlicks{i} = newlicks(sortedOrder);
-            goodlicks{i} = manualLickID(data(i),validLicks{i},savedir,validLicks,i);
+            if (i == 1)
+                goodlicks{i} = manualLickID(data(i),validLicks{i},savedir,validLicks,i);
+            else
+                goodlicks{i} = manualLickID(data(i),validLicks{i},savedir,goodlicks,i);
+            end
         end
     end
 else

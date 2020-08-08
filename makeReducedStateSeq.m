@@ -1,4 +1,4 @@
-function [reducedStateVec] = makeReducedStateSeq(basedir,date,animal,exptStartOffset)
+function [reducedStateVec,states] = makeReducedStateSeq(basedir,date,animal,exptStartOffset)
 curdir = [basedir '/' date '/' animal];
 metadata = load([curdir '/metadata.mat']); metadata=metadata.metadata;
 lchan = metadata.leftChannel;
@@ -30,6 +30,10 @@ for i=1:length(order)
             reducedStateVec(t1:t2) = i+1;
         end
     end
+end
+states = zeros(1+length(bouts),length(reducedStateVec));
+for i=1:length(reducedStateVec)
+    states(reducedStateVec(i),i) = 1;
 end
 end
 

@@ -12,6 +12,9 @@ function [newbouts] = manual_stitch_bouts(data,bouts)
 if (isempty(bouts))
     newbouts = [];
     return;
+elseif (length(bouts) == 1)
+    newbouts = bouts;
+    return;
 end
 dataMax = max(data.raw_voltage);
 nGood = 0;
@@ -61,8 +64,8 @@ function KeyPressCb(~,evnt)
             tempBout.duration = tempBout.offset - tempBout.onset;
             tempBout.solution = bouts(curBout).solution;
         else
-            tempBout.nlicks = tempBout.nlicks + bouts(curBout).nlicks;
-            tempBout.licks = [tempBout.licks bouts(curBout).licks];
+            tempBout.nlicks = tempBout.nlicks + bouts(curBout+1).nlicks;
+            tempBout.licks = [tempBout.licks bouts(curBout+1).licks];
             tempBout.offset = bouts(curBout+1).offset;
             tempBout.offset_ind = bouts(curBout+1).offset_ind;
             tempBout.duration = tempBout.offset - tempBout.onset;
@@ -88,9 +91,20 @@ end
 function plotNext(curBout)
     if (curBout > (length(bouts)-1))
         close all;
-        if (~strcmp(lastKey,'leftarrow'))
+        if (strcmp(lastKey,'rightarrow'))
             nGood = nGood + 1;
             newbouts(nGood) = tempBout;
+        elseif (strcmp(lastKey,'leftarrow'))
+            nGood = nGood + 1;
+            oldTempBout = tempBout;
+            if (isempty(fieldnames(tempBout)))
+                tempBout = bouts(curBout);
+            else
+                error('tempBout should be empty')
+            end
+            newbouts(nGood) = tempBout;
+            tempBout = struct();
+            lastKey = 'leftarrow';
         end
         return;
     end

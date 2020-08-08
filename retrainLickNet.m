@@ -4,12 +4,13 @@ disp('creating input from data ...')
 disp('input created ...')
 nbatches = ceil(length(Xtr)/batchSize);
 i=1;
-initialLearnRate = .000005;
+initialLearnRate = .005;
 while i < nbatches
     try
         disp(['Batch ' num2str(i) ' / ' num2str(nbatches)])
         if (strcmp(netType,'2bottle'))
             lickNet = load(['analysis_code/bilstmLickNet2Bottle.mat']); lickNet=lickNet.bilstmLickNet;
+            save('analysis_code/oldLickNet.mat','lickNet','-mat')
         elseif (strcmp(netType,'3bottle'))
             lickNet = load(['analysis_code/bilstmLickNet3Bottle.mat']); lickNet=lickNet.bilstmLickNet;
         else
